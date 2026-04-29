@@ -1,0 +1,154 @@
+        -:    0:Source:Guesser.cpp
+        -:    0:Graph:Guesser.gcno
+        -:    0:Data:Guesser.gcda
+        -:    0:Runs:1
+        -:    1:#include "Guesser.h"
+        -:    2:#include <string>
+        -:    3:#include <cmath>
+        -:    4:
+        -:    5:using std::string;
+        -:    6:
+        -:    7:/*
+        -:    8:  Returns an whole number representing the distance between the guess,
+        -:    9:  provided as an argument, and the secret. The distance represents the number
+        -:   10:  of characters that would have to be changed at the same location to match
+        -:   11:  the other string. When the two strings are identical, the distance is 0,
+        -:   12:  but for each letter different, the distance increases by 1. When the
+        -:   13:  strings are different lengths, each of the extra characters in the longer
+        -:   14:  string also counts as an increase in 1 to the distance, up to the length of
+        -:   15:  the secret; in other words, if m_secret has a 10 characters and the guess
+        -:   16:  has 100, the distance is 10.
+        -:   17:*/
+function _ZN7Guesser8distanceENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE called 10 returned 100% blocks executed 100%
+       10:   18:unsigned int Guesser::distance(string guess){
+       10:   19:  int length_diff = 0;
+       10:   20:  if( guess.length() > m_secret.length() ){
+call    0 returned 10
+call    1 returned 10
+branch  2 taken 3 (fallthrough)
+branch  3 taken 7
+        3:   21:    length_diff += guess.length() - m_secret.length();
+call    0 returned 3
+call    1 returned 3
+        -:   22:  }
+        7:   23:  else if( guess.length() < m_secret.length() ){
+call    0 returned 7
+call    1 returned 7
+branch  2 taken 1 (fallthrough)
+branch  3 taken 6
+        1:   24:    length_diff += m_secret.length() - guess.length();
+call    0 returned 1
+call    1 returned 1
+        -:   25:  }
+       89:   26:  for(int i=0; i < m_secret.length() && i < guess.length(); i++ ){
+call    0 returned 89
+branch  1 taken 80 (fallthrough)
+branch  2 taken 9
+call    3 returned 80
+branch  4 taken 79 (fallthrough)
+branch  5 taken 1
+branch  6 taken 79
+branch  7 taken 10 (fallthrough)
+       79:   27:    if( m_secret.at(i) != guess.at(i) ){
+call    0 returned 79
+call    1 returned 79
+branch  2 taken 39 (fallthrough)
+branch  3 taken 40
+       39:   28:      length_diff++;
+        -:   29:    }
+        -:   30:  }
+       10:   31:  if( length_diff > m_secret.length() ){
+call    0 returned 10
+branch  1 taken 1 (fallthrough)
+branch  2 taken 9
+        1:   32:    length_diff = m_secret.length();
+call    0 returned 1
+        -:   33:  }
+       10:   34:  return length_diff;
+        -:   35:}
+        -:   36:
+        -:   37:/*
+        -:   38:  Constructor requires that the secret phrase is provided its value as
+        -:   39:  an argument. This secret will not change for the lifespan of an instance
+        -:   40:  of any Guesser object and must have a length of 32 characters or less,
+        -:   41:  otherwise, it will be truncated at that length.
+        -:   42:*/
+function _ZN7GuesserC2ENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE called 10 returned 100% blocks executed 83%
+       10:   43:Guesser::Guesser(string secret){
+call    0 returned 10
+       10:   44:  if( secret.length() > 32 ){
+call    0 returned 10
+branch  1 taken 1 (fallthrough)
+branch  2 taken 9
+        1:   45:    m_secret = secret.substr(0, 32);
+call    0 returned 1
+branch  1 taken 1 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 1
+call    4 returned 1
+        -:   46:  }
+        -:   47:  else{
+        9:   48:    m_secret = secret;
+call    0 returned 9
+branch  1 taken 9 (fallthrough)
+branch  2 taken 0 (throw)
+        -:   49:  }
+       10:   50:  m_locked = false;
+       10:   51:  m_remaining = 3;
+       10:   52:}
+call    0 never executed
+        -:   53:
+        -:   54:/*
+        -:   55:  Determines and returns whether the provided guess matches the secret
+        -:   56:  phrase. However, the function also returns false if the secret is locked,
+        -:   57:  which happens if either (or both): 
+        -:   58:    (A) there are no remaining guesses allowed
+        -:   59:    (B) the function detects brute force, as indicated by a guess that has a
+        -:   60:        distance greater than 2 from the secret
+        -:   61:  See the distance() functions for specifications regarding determining the 
+        -:   62:  distance between a guess and the secret.
+        -:   63:  
+        -:   64:  A Guesser object allows up to
+        -:   65:  three (3) consecutive guesses without a match. If three guesses are made
+        -:   66:  without any being a true match, the secret is locked. However, whenever
+        -:   67:  an unlocked secret is guessed with a true match, the guesses remaining
+        -:   68:  reset to three (3). If the secret is locked for any other reason, such
+        -:   69:  as a big distance in a guess, the count of remaining guesses should still
+        -:   70:  count down as usual to hide that the secret has been locked.
+        -:   71:*/
+function _ZN7Guesser5matchENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE called 5 returned 100% blocks executed 76%
+        5:   72:bool Guesser::match(string guess){
+        5:   73:  if( m_remaining < 1 || m_locked ){
+branch  0 taken 5 (fallthrough)
+branch  1 taken 0
+branch  2 taken 0 (fallthrough)
+branch  3 taken 5
+    #####:   74:    return false;
+        -:   75:  }
+        5:   76:  else if( guess != m_secret ){
+call    0 returned 5
+branch  1 taken 4 (fallthrough)
+branch  2 taken 1
+        4:   77:    unsigned int difference = distance(guess);
+call    0 returned 4
+branch  1 taken 4 (fallthrough)
+branch  2 taken 0 (throw)
+call    3 returned 4
+branch  4 taken 4 (fallthrough)
+branch  5 taken 0 (throw)
+call    6 returned 4
+call    7 never executed
+        4:   78:    if( difference > 2 ){
+branch  0 taken 0 (fallthrough)
+branch  1 taken 4
+    #####:   79:      m_locked = true;
+        -:   80:    }
+        -:   81:    else{
+        4:   82:      m_remaining--;
+        -:   83:    }
+        4:   84:    return false;
+        -:   85:  }
+        -:   86:  else{
+        1:   87:    return true;
+        -:   88:  }
+        -:   89:}
